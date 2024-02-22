@@ -71,4 +71,36 @@ public class ResettingRaffel<T>{
         }
         return goal;
     }
+    /**
+     * return number of items in 'this'
+     * 
+     * @return number of items in 'this'
+    */
+    public int size(){
+        return this.main.size();
+    }
+    /**
+     * return number of items in 'this' total
+     * 
+     * @return number of items in 'this' total
+    */
+    public int sizeTotal(){
+        return this.main.size() + this.backup.size();
+    }
+    /**
+     * return number of item types stored in 'this'
+     * 
+     * @return number of item types stored in 'this'
+    */
+    public int typeSize(){
+        return this.main.typeSize();
+    }
+    /**
+     * return number of item types stored in 'this' total
+     * 
+     * @return number of item types stored in 'this' total
+    */
+    public int typeSizeTotal(){
+        return this.main.typeSize() + this.backup.typeSize();
+    }
 }

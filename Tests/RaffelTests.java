@@ -7,6 +7,9 @@ import Random.Raffel;
 public class RaffelTests {
     public static void main(String[] ars){
         Raffel<String> raffel = new Raffel<String>();
+        
+        /*
+        Raffel<String> raffel = new Raffel<String>();
         raffel.add("1");
         System.out.println(raffel.size());
         System.out.println(raffel.typeSize());
@@ -44,5 +47,6 @@ public class RaffelTests {
         for(String value: hashMap.keySet()){
             System.out.println(value + " " + hashMap.get(value));
         }
+        */
     }
 }
