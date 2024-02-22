@@ -114,6 +114,20 @@ public class Raffel<T>{
         return goal;
     }
     /**
+     * return a random 'T' with each index weighted by it's size
+     * 
+     * @return random 'T' with each index weighted by it's size or null iff this is empty
+    */
+    public List<T> peak(int numOfItems){
+        this.checkRep();
+        List<T> goal = new ArrayList<>();
+        for(int i = 0; i != numOfItems; i++){
+            goal.add(this.peak());
+        }
+        this.checkRep();
+        return goal;
+    }
+    /**
      * remove and return a random 'T' with each index weighted by it's size
      * 
      * @modefies 'this' removes value that was returned from 'this'. Iff 'this' is empty, this is not modifies
@@ -127,31 +141,20 @@ public class Raffel<T>{
         }
         // Record value
         int index = getRandomIndex();
-        Node<T> goal = NODES.get(index);
-        T goalValue = goal.value;
-        // Remove value
-        this.size--;
-        this.NODES.get(index).size--;
-        this.adjustParentNode(index, -1);
-        if(this.NODES.get(index).size != 0){
+        Node<T> goal = this.NODES.get(index);
+        // Check if node must be removed
+        if(goal.size == 1){
+            T goalValue = goal.value;
+            removeNode(index);
             this.checkRep();
             return goalValue;
         }
-        // Remove empty node
-        // *record last node
-        int finalIndex = this.NODES.size() - 1;
-        Node<T> finalNode = this.NODES.get(finalIndex);
-        // *copy last node info to removed node
-        goal.value = finalNode.value;
-        goal.size = finalNode.size;
-        this.adjustParentNode(index, finalNode.size);
-        this.NODEINDEX.put(finalNode.value, index);
-        this.NODEINDEX.remove(goalValue);
-        // *remove final node
-        this.adjustParentNode(finalIndex, -finalNode.size);
-        this.NODES.remove(finalIndex);
+        // Remove value
+        this.size--;
+        goal.size--;
+        this.adjustParentNode(index, -1);
         this.checkRep();
-        return goalValue;
+        return goal.value;
     }
     /**
      * remove and return a list of 'numOfItems' random 'T's with each index weighted by it's size
@@ -172,6 +175,39 @@ public class Raffel<T>{
         }
         this.checkRep();
         return goal;
+    }
+    /**
+     * Return all possible values
+     * 
+     * @return all possible values
+    */
+    public Set<T> getPossibleValues(){
+        return this.NODEINDEX.keySet();
+    }
+    /**
+     * Find the number of 'value' in 'this'.
+     * 
+     * @param value the value whos amount we want to see
+     * @return the number of 'value' in 'this'
+     */
+    public int getAmount(T value){
+        return this.NODES.get(this.NODEINDEX.get(value)).size;
+    }
+    /**
+     * Set the number of 'value' in 'this' to 'amount'.
+     * 
+     * @param value value to have amount edited
+     * @param amount amount of 'value' that 'this' should now have
+     * @throws IllegalArgumentException 'amount' < 0
+     * @modifies 'this' set amount of 'value' to amount
+     */
+    public void setAmount(T value, int amount){
+        this.checkRep();
+        if(this.NODEINDEX.containsKey(value)){
+            removeNode(this.NODEINDEX.get(value));
+        }
+        add(value, amount);
+        this.checkRep();
     }
     /**
      * return number of items in 'this'
@@ -197,6 +233,42 @@ public class Raffel<T>{
     public boolean isEmpty(){
         return this.NODEINDEX.isEmpty();
     }
+    /**
+     * Set size to 'requestedSize'. Mostly maintain same value ratios
+     * 
+     * @param requestedSize size to set to
+     * @modifies 'this' scales 'this' up or down to 'requestedSize'
+    */
+    public void resize(int requestedSize){
+        this.checkRep();
+        double resizeFactor = (requestedSize *1.0) / this.size;
+        for(Node<T> node: this.NODES){
+            int addition = 1;
+            double amount = this.getAmount(node.value) * resizeFactor;
+            if(0 == amount % 1){
+                addition = 0;
+            }
+            this.setAmount(node.value, (int)amount + addition);
+        }
+        if(this.size > requestedSize){
+            this.pull(this.size - requestedSize);
+            this.checkRep();
+            return;
+        }
+        List<T> toAdd = peak(requestedSize - this.size);
+        for(T item: toAdd){
+            this.add(item);
+        }
+        this.checkRep();
+    }
+    @Override
+    public Raffel<T> clone(){
+        Raffel<T> goal = new Raffel<T>();
+        for(Node<T> node: this.NODES){
+            goal.add(node.value, node.size);
+        }
+        return goal;
+    }
     private void checkRep(){
         if(!DEBUG){
             return;
@@ -207,7 +279,7 @@ public class Raffel<T>{
         int size = 0;
         for(T nodeValue: NODEINDEX.keySet()){
             int nodeIndex = NODEINDEX.get(nodeValue);
-            Node node = NODES.get(nodeIndex);
+            Node<T> node = NODES.get(nodeIndex);
             asert(node.size > 0, "Node has none positive size");
             asert(node.leftSize >= 0, "Node has none positive child");
             asert(node.rightSize >= 0, "Node has none positive child");
@@ -230,7 +302,7 @@ public class Raffel<T>{
     private int getRandomIndex(){
         int current = 0;
         while(true){
-            Node node = NODES.get(current);
+            Node<T> node = NODES.get(current);
             int totalChildSize = node.leftSize + node.rightSize;
             double chanceOfStaying = (node.size * 1.0) / (totalChildSize + node.size);
             if(random.nextDouble() < chanceOfStaying){
@@ -242,6 +314,31 @@ public class Raffel<T>{
             }
         }
         
+    }
+    /**
+     * Remove node at index 'index'
+     * 
+     * @param index index of node to be removed
+     * @modifies 'this' remove node at index 'index'
+    */
+    private void removeNode(int index){
+        Node<T> goal = NODES.get(index);
+        T goalValue = goal.value;
+        // Empty node
+        this.adjustParentNode(index, -goal.size);
+        this.size -= goal.size;
+        // record last node
+        int finalIndex = this.NODES.size() - 1;
+        Node<T> finalNode = this.NODES.get(finalIndex);
+        // copy last node info to removed node
+        goal.value = finalNode.value;
+        goal.size = finalNode.size;
+        this.adjustParentNode(index, finalNode.size);
+        this.NODEINDEX.put(finalNode.value, index);
+        this.NODEINDEX.remove(goalValue);
+        // remove final node
+        this.adjustParentNode(finalIndex, -finalNode.size);
+        this.NODES.remove(finalIndex);
     }
     /**
      * Find the parent location of the 'child' index
@@ -286,7 +383,7 @@ public class Raffel<T>{
             return;
         }
         int parent = parent(node);
-        Node parentNode = NODES.get(parent);
+        Node<T> parentNode = NODES.get(parent);
         int firstChild = firstChild(parent);
         if(firstChild == node){
             parentNode.leftSize += adjustment;
