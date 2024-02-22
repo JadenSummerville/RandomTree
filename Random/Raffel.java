@@ -180,6 +180,9 @@ public class Raffel<T>{
      * @return the number of 'value' in 'this'
      */
     public int getAmount(T value){
+        if(!this.NODEINDEX.containsKey(value)){
+            return 0;
+        }
         return this.NODES.get(this.NODEINDEX.get(value)).size;
     }
     /**
