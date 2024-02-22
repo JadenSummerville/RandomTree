@@ -3,11 +3,25 @@ package Random;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A ResettingRaffle allows you to insert objets and then randomly call them.
+ * Afer calling the object, it is removed. The raffel will reset when emptied
+ * @param <T> objets to be randomly generated.
+*/
 public class ResettingRaffel<T>{
     private Raffel<T> main;
     private Raffel<T> backup;
     private int numOfResets;
+    /**
+     * Creates a ResettingRaffel from 'raffel'.
+     * 
+     * @param raffel raffel to pull from
+     * @throws Error iff raffel.typeSize() < 2
+    */
     public ResettingRaffel(Raffel<T> raffel){
+        if(raffel.typeSize() < 2){
+            throw new Error();
+        }
         this.main = raffel;
         this.backup = new Raffel<>();
         numOfResets = 0;
