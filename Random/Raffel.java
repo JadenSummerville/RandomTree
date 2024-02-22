@@ -8,7 +8,7 @@ import java.util.*;
  * @param <T> objets to be randomly generated.
 */
 public class Raffel<T>{
-    private final boolean DEBUG = true;
+    private final boolean DEBUG = false;
     private final HashMap<T, Integer> NODEINDEX;
     private final ArrayList<Node<T>> NODES;
     private int size;
