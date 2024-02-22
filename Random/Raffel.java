@@ -86,9 +86,8 @@ public class Raffel<T>{
         }
         if(this.NODEINDEX.containsKey(element)){
             int index = NODEINDEX.get(element);
-            NODES.get(index).size += amount;
-            adjustParentNode(index, amount);
-            this.size += amount;
+            Node<T> node = this.NODES.get(index);
+            adjustNodeSize(node, amount + node.size);
             this.checkRep();
             return;
         }
@@ -142,17 +141,7 @@ public class Raffel<T>{
         // Record value
         int index = getRandomIndex();
         Node<T> goal = this.NODES.get(index);
-        // Check if node must be removed
-        if(goal.size == 1){
-            T goalValue = goal.value;
-            removeNode(index);
-            this.checkRep();
-            return goalValue;
-        }
-        // Remove value
-        this.size--;
-        goal.size--;
-        this.adjustParentNode(index, -1);
+        adjustNodeSize(goal, goal.size - 1);
         this.checkRep();
         return goal.value;
     }
@@ -203,10 +192,22 @@ public class Raffel<T>{
      */
     public void setAmount(T value, int amount){
         this.checkRep();
-        if(this.NODEINDEX.containsKey(value)){
-            removeNode(this.NODEINDEX.get(value));
+        if(amount < 0){
+            throw new IllegalArgumentException();
         }
-        add(value, amount);
+        if(!this.NODEINDEX.containsKey(value)){
+            add(value, amount);
+            this.checkRep();
+            return;
+        }
+        if(amount == 0){
+            removeNode(this.NODEINDEX.get(value));
+            this.checkRep();
+            return;
+        }
+        int index = this.NODEINDEX.get(value);
+        Node<T> node = this.NODES.get(index);
+        adjustNodeSize(node, amount);
         this.checkRep();
     }
     /**
@@ -237,6 +238,7 @@ public class Raffel<T>{
      * Set size to 'requestedSize'. Mostly maintain same value ratios
      * 
      * @param requestedSize size to set to
+     * @requires 'this' is not empty
      * @modifies 'this' scales 'this' up or down to 'requestedSize'
     */
     public void resize(int requestedSize){
@@ -339,6 +341,28 @@ public class Raffel<T>{
         // remove final node
         this.adjustParentNode(finalIndex, -finalNode.size);
         this.NODES.remove(finalIndex);
+    }
+    /**
+     * Set 'node' size to 'size'. Delet the node if we are setting size to 0.
+     * 
+     * @param node node to have size adjustemt or node to be removed
+     * @param size size 'node' is to be set to
+     * @throws IllegalArgumentException size < 0
+     * @modifies 'this' sets 'node' size to 'size' if size > 0. If 'size' == 0, deletes 'node'
+    */
+    private void adjustNodeSize(Node<T> node, int size){
+        if(size < 0){
+            throw new IllegalArgumentException();
+        }
+        int index = this.NODEINDEX.get(node.value);
+        if(size == 0){
+            this.removeNode(index);
+            return;
+        }
+        int adjustment = size - node.size;
+        node.size += adjustment;
+        this.size += adjustment;
+        this.adjustParentNode(index, adjustment);
     }
     /**
      * Find the parent location of the 'child' index
