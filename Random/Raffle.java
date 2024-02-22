@@ -7,37 +7,25 @@ import java.util.*;
  * Afer calling the object, it is removed.
  * @param <T> objets to be randomly generated.
 */
-public class Raffel<T>{
+public class Raffle<T>{
     private final boolean DEBUG = false;
     private final HashMap<T, Integer> NODEINDEX;
     private final ArrayList<Node<T>> NODES;
     private int size;
     private static final Random random = new Random();
     /**
-     * Creates an empty Raffel
+     * Creates an empty Raffle
      */
-    public Raffel(){
+    public Raffle(){
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
         this.checkRep();
     }
     /**
-     * Creates a Raffel with all elements in 'elements'.
+     * Creates a Raffle with all elements in 'elements'.
      */
-    public Raffel(T[] elements){
-        this.NODEINDEX = new HashMap<>();
-        this.NODES = new ArrayList<>();
-        this.size = 0;
-        for(T element: elements){
-            this.add(element);
-        }
-        this.checkRep();
-    }
-    /**
-     * Creates a Raffel with all elements in 'elements'.
-     */
-    public Raffel(List<T> elements){
+    public Raffle(T[] elements){
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
@@ -47,9 +35,9 @@ public class Raffel<T>{
         this.checkRep();
     }
     /**
-     * Creates a Raffel with all elements in 'elements'.
+     * Creates a Raffle with all elements in 'elements'.
      */
-    public Raffel(Set<T> elements){
+    public Raffle(List<T> elements){
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
@@ -59,7 +47,19 @@ public class Raffel<T>{
         this.checkRep();
     }
     /**
-     * Add 'element' to the raffel
+     * Creates a Raffle with all elements in 'elements'.
+     */
+    public Raffle(Set<T> elements){
+        this.NODEINDEX = new HashMap<>();
+        this.NODES = new ArrayList<>();
+        this.size = 0;
+        for(T element: elements){
+            this.add(element);
+        }
+        this.checkRep();
+    }
+    /**
+     * Add 'element' to the raffle
      * 
      * @param element element to be added
      * @modifies this adds element to this
@@ -70,7 +70,7 @@ public class Raffel<T>{
         this.checkRep();
     }
     /**
-     * Add 'amount' 'element's to the raffel
+     * Add 'amount' 'element's to the raffle
      * 
      * @param element element(s) to be added
      * @param amount number of 'element' to add
@@ -102,7 +102,7 @@ public class Raffel<T>{
      * 
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public T peak(){
+    public T peek(){
         this.checkRep();
         if(this.isEmpty()){
             return null;
@@ -117,11 +117,11 @@ public class Raffel<T>{
      * 
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public List<T> peak(int numOfItems){
+    public List<T> peek(int numOfItems){
         this.checkRep();
         List<T> goal = new ArrayList<>();
         for(int i = 0; i != numOfItems; i++){
-            goal.add(this.peak());
+            goal.add(this.peek());
         }
         this.checkRep();
         return goal;
@@ -260,15 +260,15 @@ public class Raffel<T>{
             this.checkRep();
             return;
         }
-        List<T> toAdd = peak(requestedSize - this.size);
+        List<T> toAdd = peek(requestedSize - this.size);
         for(T item: toAdd){
             this.add(item);
         }
         this.checkRep();
     }
     @Override
-    public Raffel<T> clone(){
-        Raffel<T> goal = new Raffel<T>();
+    public Raffle<T> clone(){
+        Raffle<T> goal = new Raffle<T>();
         for(Node<T> node: this.NODES){
             goal.add(node.value, node.size);
         }

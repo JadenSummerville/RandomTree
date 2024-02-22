@@ -5,25 +5,25 @@ import java.util.List;
 
 /**
  * A ResettingRaffle allows you to insert objets and then randomly call them.
- * Afer calling the object, it is removed. The raffel will reset when emptied
+ * Afer calling the object, it is removed. The raffle will reset when emptied
  * @param <T> objets to be randomly generated.
 */
-public class ResettingRaffel<T>{
-    private Raffel<T> main;
-    private Raffel<T> backup;
+public class ResettingRaffle<T>{
+    private Raffle<T> main;
+    private Raffle<T> backup;
     private int numOfResets;
     /**
-     * Creates a ResettingRaffel from 'raffel'.
+     * Creates a ResettingRaffle from 'raffle'.
      * 
-     * @param raffel raffel to pull from
-     * @throws Error iff raffel.typeSize() < 2
+     * @param raffle raffle to pull from
+     * @throws Error iff raffle.typeSize() < 2
     */
-    public ResettingRaffel(Raffel<T> raffel){
-        if(raffel.typeSize() < 2){
+    public ResettingRaffle(Raffle<T> raffle){
+        if(raffle.typeSize() < 2){
             throw new Error();
         }
-        this.main = raffel;
-        this.backup = new Raffel<>();
+        this.main = raffle;
+        this.backup = new Raffle<>();
         numOfResets = 0;
     }
     /**
@@ -31,8 +31,8 @@ public class ResettingRaffel<T>{
      * 
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public T peak(){
-        return this.peak();
+    public T peek(){
+        return this.peek();
     }
     /**
      * Remove and return a random 'T' with each index weighted by it's size.
@@ -45,7 +45,7 @@ public class ResettingRaffel<T>{
         T value = main.pull();
         backup.add(value);
         if(main.isEmpty()){
-            Raffel<T> o = main;
+            Raffle<T> o = main;
             main = backup;
             backup = o;
             numOfResets++;
