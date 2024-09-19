@@ -16,7 +16,7 @@ public class Raffle<T>{
     /**
      * Creates an empty Raffle
      */
-    public Raffle(){
+    public Raffle() {
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
@@ -25,11 +25,11 @@ public class Raffle<T>{
     /**
      * Creates a Raffle with all elements in 'elements'.
      */
-    public Raffle(T[] elements){
+    public Raffle(T[] elements) {
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
-        for(T element: elements){
+        for (T element: elements) {
             this.add(element);
         }
         this.checkRep();
@@ -37,11 +37,11 @@ public class Raffle<T>{
     /**
      * Creates a Raffle with all elements in 'elements'.
      */
-    public Raffle(List<T> elements){
+    public Raffle(List<T> elements) {
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
-        for(T element: elements){
+        for (T element: elements) {
             this.add(element);
         }
         this.checkRep();
@@ -49,11 +49,11 @@ public class Raffle<T>{
     /**
      * Creates a Raffle with all elements in 'elements'.
      */
-    public Raffle(Set<T> elements){
+    public Raffle(Set<T> elements) {
         this.NODEINDEX = new HashMap<>();
         this.NODES = new ArrayList<>();
         this.size = 0;
-        for(T element: elements){
+        for (T element: elements) {
             this.add(element);
         }
         this.checkRep();
@@ -64,7 +64,7 @@ public class Raffle<T>{
      * @param element element to be added
      * @modifies this adds element to this
     */
-    public void add(T element){
+    public void add(T element) {
         this.checkRep();
         add(element, 1);
         this.checkRep();
@@ -77,14 +77,14 @@ public class Raffle<T>{
      * @throws IllegalArgumentException 'amount' < 0
      * @modifies this adds 'amount' elements to this
     */
-    public void add(T element, int amount){
+    public void add(T element, int amount) {
         this.checkRep();
-        if(amount == 0){
+        if (amount == 0) {
             return;
-        }if(amount < 0){
+        }if (amount < 0) {
             throw new IllegalArgumentException();
         }
-        if(this.NODEINDEX.containsKey(element)){
+        if (this.NODEINDEX.containsKey(element)) {
             int index = NODEINDEX.get(element);
             Node<T> node = this.NODES.get(index);
             adjustNodeSize(node, amount + node.size);
@@ -102,9 +102,9 @@ public class Raffle<T>{
      * 
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public T peek(){
+    public T peek() {
         this.checkRep();
-        if(this.isEmpty()){
+        if (this.isEmpty()) {
             return null;
         }
         int index = getRandomIndex();
@@ -117,10 +117,10 @@ public class Raffle<T>{
      * 
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public List<T> peek(int numOfItems){
+    public List<T> peek(int numOfItems) {
         this.checkRep();
         List<T> goal = new ArrayList<>();
-        for(int i = 0; i != numOfItems; i++){
+        for (int i = 0; i != numOfItems; i++) {
             goal.add(this.peek());
         }
         this.checkRep();
@@ -132,18 +132,19 @@ public class Raffle<T>{
      * @modefies 'this' removes value that was returned from 'this'. Iff 'this' is empty, this is not modifies
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public T pull(){
+    public T pull() {
         this.checkRep();
         // Check is empty
-        if(this.isEmpty()){
+        if (this.isEmpty()) {
             return null;
         }
         // Record value
         int index = getRandomIndex();
         Node<T> goal = this.NODES.get(index);
+        T value = goal.value;
         adjustNodeSize(goal, goal.size - 1);
         this.checkRep();
-        return goal.value;
+        return value;
     }
     /**
      * remove and return a list of 'numOfItems' random 'T's with each index weighted by it's size
@@ -153,13 +154,13 @@ public class Raffle<T>{
      * @throws Exception Iff numOfItems > size or numOfItems < 0.
      * @return random 'T' with each index weighted by it's size or null iff this is empty
     */
-    public List<T> pull(int numOfItems){
+    public List<T> pull(int numOfItems) {
         this.checkRep();
-        if(numOfItems > this.size || numOfItems < 0){
+        if (numOfItems > this.size || numOfItems < 0) {
             throw new Error();
         }
         List<T> goal = new ArrayList<>();
-        for(int i = 0; i != numOfItems; i++){
+        for (int i = 0; i != numOfItems; i++) {
             goal.add(this.pull());
         }
         this.checkRep();
@@ -170,7 +171,7 @@ public class Raffle<T>{
      * 
      * @return all possible values
     */
-    public Set<T> getPossibleValues(){
+    public Set<T> getPossibleValues() {
         return this.NODEINDEX.keySet();
     }
     /**
@@ -179,8 +180,8 @@ public class Raffle<T>{
      * @param value the value whos amount we want to see
      * @return the number of 'value' in 'this'
      */
-    public int getAmount(T value){
-        if(!this.NODEINDEX.containsKey(value)){
+    public int getAmount(T value) {
+        if (!this.NODEINDEX.containsKey(value)) {
             return 0;
         }
         return this.NODES.get(this.NODEINDEX.get(value)).size;
@@ -193,17 +194,17 @@ public class Raffle<T>{
      * @throws IllegalArgumentException 'amount' < 0
      * @modifies 'this' set amount of 'value' to amount
      */
-    public void setAmount(T value, int amount){
+    public void setAmount(T value, int amount) {
         this.checkRep();
-        if(amount < 0){
+        if (amount < 0) {
             throw new IllegalArgumentException();
         }
-        if(!this.NODEINDEX.containsKey(value)){
+        if (!this.NODEINDEX.containsKey(value)) {
             add(value, amount);
             this.checkRep();
             return;
         }
-        if(amount == 0){
+        if (amount == 0) {
             removeNode(this.NODEINDEX.get(value));
             this.checkRep();
             return;
@@ -218,7 +219,7 @@ public class Raffle<T>{
      * 
      * @return number of items in 'this'
     */
-    public int size(){
+    public int size() {
         return this.size;
     }
     /**
@@ -226,7 +227,7 @@ public class Raffle<T>{
      * 
      * @return number of item types stored in 'this'
     */
-    public int typeSize(){
+    public int typeSize() {
         return this.NODES.size();
     }
     /**
@@ -234,7 +235,7 @@ public class Raffle<T>{
      * 
      * @return true iff there are no elements in 'this'
     */
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return this.NODEINDEX.isEmpty();
     }
     /**
@@ -244,45 +245,45 @@ public class Raffle<T>{
      * @requires 'this' is not empty
      * @modifies 'this' scales 'this' up or down to 'requestedSize'
     */
-    public void resize(int requestedSize){
+    public void resize(int requestedSize) {
         this.checkRep();
         double resizeFactor = (requestedSize *1.0) / this.size;
-        for(Node<T> node: this.NODES){
+        for (Node<T> node: this.NODES) {
             int addition = 1;
             double amount = this.getAmount(node.value) * resizeFactor;
-            if(0 == amount % 1){
+            if (0 == amount % 1) {
                 addition = 0;
             }
             this.setAmount(node.value, (int)amount + addition);
         }
-        if(this.size > requestedSize){
+        if (this.size > requestedSize) {
             this.pull(this.size - requestedSize);
             this.checkRep();
             return;
         }
         List<T> toAdd = peek(requestedSize - this.size);
-        for(T item: toAdd){
+        for (T item: toAdd) {
             this.add(item);
         }
         this.checkRep();
     }
     @Override
-    public Raffle<T> clone(){
+    public Raffle<T> clone() {
         Raffle<T> goal = new Raffle<T>();
-        for(Node<T> node: this.NODES){
+        for (Node<T> node: this.NODES) {
             goal.add(node.value, node.size);
         }
         return goal;
     }
-    private void checkRep(){
-        if(!DEBUG){
+    private void checkRep() {
+        if (!DEBUG) {
             return;
         }
         asert(this.NODEINDEX != null, "this.nodeIndex == null");
         asert(this.NODES != null, "this.NODES == null");
         asert(this.NODEINDEX.size() == this.NODES.size(), "Type size mismatch");
         int size = 0;
-        for(T nodeValue: NODEINDEX.keySet()){
+        for (T nodeValue: NODEINDEX.keySet()) {
             int nodeIndex = NODEINDEX.get(nodeValue);
             Node<T> node = NODES.get(nodeIndex);
             asert(node.size > 0, "Node has none positive size");
@@ -293,8 +294,8 @@ public class Raffle<T>{
         }
         asert(this.size == size, "Nodes do not add up to size");
         }
-    private static void asert(boolean asert, String errorMessage){
-        if(!asert){
+    private static void asert(boolean asert, String errorMessage) {
+        if (!asert) {
             throw new RuntimeException(errorMessage);
         }
     }
@@ -304,15 +305,15 @@ public class Raffle<T>{
      * @requires this is not empty
      * @return random index with each index weighted by it's size
     */
-    private int getRandomIndex(){
+    private int getRandomIndex() {
         int current = 0;
-        while(true){
+        while(true) {
             Node<T> node = NODES.get(current);
             int totalChildSize = node.leftSize + node.rightSize;
             double chanceOfStaying = (node.size * 1.0) / (totalChildSize + node.size);
-            if(random.nextDouble() < chanceOfStaying){
+            if (random.nextDouble() < chanceOfStaying) {
                 return current;
-            }if(random.nextDouble() < (node.leftSize * 1.0) / (totalChildSize)){
+            }if (random.nextDouble() < (node.leftSize * 1.0) / (totalChildSize)) {
                 current = firstChild(current);
             }else{
                 current = secondChild(current);
@@ -326,7 +327,7 @@ public class Raffle<T>{
      * @param index index of node to be removed
      * @modifies 'this' remove node at index 'index'
     */
-    private void removeNode(int index){
+    private void removeNode(int index) {
         Node<T> goal = NODES.get(index);
         T goalValue = goal.value;
         // Empty node
@@ -353,12 +354,12 @@ public class Raffle<T>{
      * @throws IllegalArgumentException size < 0
      * @modifies 'this' sets 'node' size to 'size' if size > 0. If 'size' == 0, deletes 'node'
     */
-    private void adjustNodeSize(Node<T> node, int size){
-        if(size < 0){
+    private void adjustNodeSize(Node<T> node, int size) {
+        if (size < 0) {
             throw new IllegalArgumentException();
         }
         int index = this.NODEINDEX.get(node.value);
-        if(size == 0){
+        if (size == 0) {
             this.removeNode(index);
             return;
         }
@@ -374,7 +375,7 @@ public class Raffle<T>{
      * @requires 'child' > 0
      * @return parent index of 'child'
     */
-    private static int parent(int child){
+    private static int parent(int child) {
         return (child - 1)/2;
     }
     /**
@@ -384,7 +385,7 @@ public class Raffle<T>{
      * @requires 'parent' >= 0
      * @return first child index of 'parent'
     */
-    private static int firstChild(int parent){
+    private static int firstChild(int parent) {
         return parent*2+1;
     }
     /**
@@ -394,7 +395,7 @@ public class Raffle<T>{
      * @requires 'parent' >= 0
      * @return second child index of 'parent'
     */
-    private static int secondChild(int parent){
+    private static int secondChild(int parent) {
         return firstChild(parent) + 1;
     }
     /**
@@ -405,14 +406,14 @@ public class Raffle<T>{
      * @modifies this adjust parent and super parents of node so that they see 'node' has grown by 'adjustment'
      * @requires node >= 0
      */
-    private void adjustParentNode(int node, int adjustment){
-        if(node == 0){
+    private void adjustParentNode(int node, int adjustment) {
+        if (node == 0) {
             return;
         }
         int parent = parent(node);
         Node<T> parentNode = NODES.get(parent);
         int firstChild = firstChild(parent);
-        if(firstChild == node){
+        if (firstChild == node) {
             parentNode.leftSize += adjustment;
         }else{
             parentNode.rightSize += adjustment;
@@ -428,7 +429,7 @@ public class Raffle<T>{
         int size; // number of 'value' stored here
         int leftSize; // total number of objects stored on left subtree
         int rightSize; // total number of objects stored on right subtree
-        Node(T value, int amount){
+        Node(T value, int amount) {
             this.value = value;
             this.size = amount;
             this.leftSize = 0;
